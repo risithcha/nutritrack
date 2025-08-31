@@ -85,7 +85,7 @@ const ProfileScreen = ({ navigation }) => {
                                                 <Ionicons name="person" size={40} color="white" />
                                         </View>
                                 </View>
-                                <Text style={styles.profileName}>{user?.email || 'NutriTrack User'}</Text>
+                                <Text style={styles.profileName}>{userProfile.name || user?.email || 'NutriTrack User'}</Text>
                                 <Text style={styles.profileSubtitle}>Health & Wellness</Text>
                         </LinearGradient>
                 </View>

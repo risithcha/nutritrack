@@ -253,17 +253,23 @@ export const NutritionProvider = ({ children }) => {
                                                         dispatch({ type: 'UPDATE_LAST_RESET_DATE', payload: userData.lastResetDate });
                                                 }
                                                 
-                                                // Load weight and water data
-                                                if (userData.weightData) {
+                                                // Load weight and water data - ensure new users start with empty data
+                                                if (userData.weightData && userData.weightData.length > 0) {
                                                         dispatch({ type: 'LOAD_FIRESTORE_DATA', payload: { weightData: userData.weightData } });
+                                                } else {
+                                                        // Ensure new users start with empty weight data
+                                                        dispatch({ type: 'LOAD_FIRESTORE_DATA', payload: { weightData: [] } });
                                                 }
                                                 
                                                 if (userData.weightGoal) {
                                                         dispatch({ type: 'UPDATE_WEIGHT_GOAL', payload: userData.weightGoal });
                                                 }
                                                 
-                                                if (userData.waterData) {
+                                                if (userData.waterData && userData.waterData.length > 0) {
                                                         dispatch({ type: 'LOAD_FIRESTORE_DATA', payload: { waterData: userData.waterData } });
+                                                } else {
+                                                        // Ensure new users start with empty water data
+                                                        dispatch({ type: 'LOAD_FIRESTORE_DATA', payload: { waterData: [] } });
                                                 }
                                                 
                                                 if (userData.waterGoal) {
@@ -364,7 +370,7 @@ export const NutritionProvider = ({ children }) => {
                 // Wait a second before saving to avoid spamming Firestore
                 const timeoutId = setTimeout(saveDataToFirestore, 1000);
                 return () => clearTimeout(timeoutId);
-        }, [user?.uid, state.userProfile, state.dailyNutrition, state.mealPlan, state.scannedFoods, state.lastResetDate]);
+        }, [user?.uid, state.userProfile, state.dailyNutrition, state.mealPlan, state.scannedFoods, state.weightData, state.waterData, state.weightGoal, state.waterGoal, state.lastResetDate]);
 
         const updateUserProfile = async (profile) => {
                 dispatch({ type: 'UPDATE_USER_PROFILE', payload: profile });

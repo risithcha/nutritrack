@@ -18,6 +18,7 @@ const LoginScreen = ({ navigation }) => {
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
     const [isLoading, setIsLoading] = useState(false);
+    const [showPassword, setShowPassword] = useState(false);
     const { signIn } = useAuth();
 
     const handleLogin = async () => {
@@ -100,8 +101,18 @@ const LoginScreen = ({ navigation }) => {
                             placeholder="Password"
                             value={password}
                             onChangeText={setPassword}
-                            secureTextEntry
+                            secureTextEntry={!showPassword}
                         />
+                        <TouchableOpacity
+                            onPress={() => setShowPassword(!showPassword)}
+                            style={styles.eyeIcon}
+                        >
+                            <Ionicons 
+                                name={showPassword ? "eye-off" : "eye"} 
+                                size={20} 
+                                color="#666" 
+                            />
+                        </TouchableOpacity>
                     </View>
 
                     <TouchableOpacity
@@ -182,6 +193,9 @@ const styles = StyleSheet.create({
         flex: 1,
         paddingVertical: 15,
         fontSize: 16,
+    },
+    eyeIcon: {
+        padding: 5,
     },
     loginButton: {
         marginTop: 20,

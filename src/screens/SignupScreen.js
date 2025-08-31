@@ -19,6 +19,8 @@ const SignupScreen = ({ navigation }) => {
     const [password, setPassword] = useState('');
     const [confirmPassword, setConfirmPassword] = useState('');
     const [isLoading, setIsLoading] = useState(false);
+    const [showPassword, setShowPassword] = useState(false);
+    const [showConfirmPassword, setShowConfirmPassword] = useState(false);
     const { signUp } = useAuth();
 
     const handleSignup = async () => {
@@ -111,8 +113,18 @@ const SignupScreen = ({ navigation }) => {
                             placeholder="Password"
                             value={password}
                             onChangeText={setPassword}
-                            secureTextEntry
+                            secureTextEntry={!showPassword}
                         />
+                        <TouchableOpacity
+                            onPress={() => setShowPassword(!showPassword)}
+                            style={styles.eyeIcon}
+                        >
+                            <Ionicons 
+                                name={showPassword ? "eye-off" : "eye"} 
+                                size={20} 
+                                color="#666" 
+                            />
+                        </TouchableOpacity>
                     </View>
 
                     <View style={styles.inputContainer}>
@@ -122,8 +134,18 @@ const SignupScreen = ({ navigation }) => {
                             placeholder="Confirm Password"
                             value={confirmPassword}
                             onChangeText={setConfirmPassword}
-                            secureTextEntry
+                            secureTextEntry={!showConfirmPassword}
                         />
+                        <TouchableOpacity
+                            onPress={() => setShowConfirmPassword(!showConfirmPassword)}
+                            style={styles.eyeIcon}
+                        >
+                            <Ionicons 
+                                name={showConfirmPassword ? "eye-off" : "eye"} 
+                                size={20} 
+                                color="#666" 
+                            />
+                        </TouchableOpacity>
                     </View>
 
                     <TouchableOpacity
@@ -204,6 +226,9 @@ const styles = StyleSheet.create({
         flex: 1,
         paddingVertical: 15,
         fontSize: 16,
+    },
+    eyeIcon: {
+        padding: 5,
     },
     signupButton: {
         marginTop: 20,
