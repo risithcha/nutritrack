@@ -9,13 +9,92 @@ import {
     KeyboardAvoidingView,
     Platform,
     ScrollView,
+    Modal,
+    FlatList,
 } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
 import { Ionicons } from '@expo/vector-icons';
-import { Picker } from '@react-native-picker/picker';
 import { useNutrition } from '../context/NutritionContext';
 import { useAuth } from '../context/AuthContext';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+
+// Custom Picker Component for better iOS compatibility
+const CustomPicker = ({ 
+    value, 
+    onValueChange, 
+    items, 
+    placeholder, 
+    icon, 
+    iconColor = "#666" 
+}) => {
+    const [modalVisible, setModalVisible] = useState(false);
+    
+    const selectedItem = items.find(item => item.value === value);
+    const displayText = selectedItem ? selectedItem.label : placeholder;
+
+    return (
+        <>
+            <TouchableOpacity 
+                style={styles.pickerContainer}
+                onPress={() => setModalVisible(true)}
+            >
+                <Ionicons name={icon} size={20} color={iconColor} style={styles.inputIcon} />
+                <Text style={[styles.pickerText, !selectedItem && styles.placeholderText]}>
+                    {displayText}
+                </Text>
+                <Ionicons name="chevron-down" size={20} color="#666" />
+            </TouchableOpacity>
+
+            <Modal
+                animationType="slide"
+                transparent={true}
+                visible={modalVisible}
+                onRequestClose={() => setModalVisible(false)}
+            >
+                <View style={styles.modalOverlay}>
+                    <View style={styles.modalContent}>
+                        <View style={styles.modalHeader}>
+                            <Text style={styles.modalTitle}>Select Option</Text>
+                            <TouchableOpacity 
+                                onPress={() => setModalVisible(false)}
+                                style={styles.closeButton}
+                            >
+                                <Ionicons name="close" size={24} color="#666" />
+                            </TouchableOpacity>
+                        </View>
+                        
+                        <FlatList
+                            data={items}
+                            keyExtractor={(item) => item.value}
+                            renderItem={({ item }) => (
+                                <TouchableOpacity
+                                    style={[
+                                        styles.modalItem,
+                                        value === item.value && styles.selectedModalItem
+                                    ]}
+                                    onPress={() => {
+                                        onValueChange(item.value);
+                                        setModalVisible(false);
+                                    }}
+                                >
+                                    <Text style={[
+                                        styles.modalItemText,
+                                        value === item.value && styles.selectedModalItemText
+                                    ]}>
+                                        {item.label}
+                                    </Text>
+                                    {value === item.value && (
+                                        <Ionicons name="checkmark" size={20} color="#4A90E2" />
+                                    )}
+                                </TouchableOpacity>
+                            )}
+                        />
+                    </View>
+                </View>
+            </Modal>
+        </>
+    );
+};
 
 const PersonalInfoSetupScreen = ({ navigation, route }) => {
     const { userEmail, userId } = route.params || {};
@@ -33,6 +112,27 @@ const PersonalInfoSetupScreen = ({ navigation, route }) => {
     });
 
     const [isLoading, setIsLoading] = useState(false);
+
+    // Picker options
+    const genderOptions = [
+        { label: 'Male', value: 'male' },
+        { label: 'Female', value: 'female' },
+        { label: 'Other', value: 'other' },
+    ];
+
+    const activityLevelOptions = [
+        { label: 'Sedentary (little or no exercise)', value: 'sedentary' },
+        { label: 'Light (light exercise 1-3 days/week)', value: 'light' },
+        { label: 'Moderate (moderate exercise 3-5 days/week)', value: 'moderate' },
+        { label: 'Active (hard exercise 6-7 days/week)', value: 'active' },
+        { label: 'Very Active (very hard exercise, physical job)', value: 'veryActive' },
+    ];
+
+    const goalOptions = [
+        { label: 'Maintain Weight', value: 'maintain' },
+        { label: 'Lose Weight', value: 'lose' },
+        { label: 'Gain Weight', value: 'gain' },
+    ];
 
     const handleSave = async () => {
         // Make sure they filled out everything we need
@@ -136,18 +236,13 @@ const PersonalInfoSetupScreen = ({ navigation, route }) => {
                         />
                     </View>
 
-                    <View style={styles.pickerContainer}>
-                        <Ionicons name="male-female" size={20} color="#666" style={styles.inputIcon} />
-                        <Picker
-                            selectedValue={formData.gender}
-                            style={styles.picker}
-                            onValueChange={(value) => updateFormData('gender', value)}
-                        >
-                            <Picker.Item label="Male" value="male" />
-                            <Picker.Item label="Female" value="female" />
-                            <Picker.Item label="Other" value="other" />
-                        </Picker>
-                    </View>
+                    <CustomPicker
+                        value={formData.gender}
+                        onValueChange={(value) => updateFormData('gender', value)}
+                        items={genderOptions}
+                        placeholder="Select Gender"
+                        icon="male-female"
+                    />
 
                     <View style={styles.inputContainer}>
                         <Ionicons name="fitness" size={20} color="#666" style={styles.inputIcon} />
@@ -171,33 +266,21 @@ const PersonalInfoSetupScreen = ({ navigation, route }) => {
                         />
                     </View>
 
-                    <View style={styles.pickerContainer}>
-                        <Ionicons name="fitness" size={20} color="#666" style={styles.inputIcon} />
-                        <Picker
-                            selectedValue={formData.activityLevel}
-                            style={styles.picker}
-                            onValueChange={(value) => updateFormData('activityLevel', value)}
-                        >
-                            <Picker.Item label="Sedentary (little or no exercise)" value="sedentary" />
-                            <Picker.Item label="Light (light exercise 1-3 days/week)" value="light" />
-                            <Picker.Item label="Moderate (moderate exercise 3-5 days/week)" value="moderate" />
-                            <Picker.Item label="Active (hard exercise 6-7 days/week)" value="active" />
-                            <Picker.Item label="Very Active (very hard exercise, physical job)" value="veryActive" />
-                        </Picker>
-                    </View>
+                    <CustomPicker
+                        value={formData.activityLevel}
+                        onValueChange={(value) => updateFormData('activityLevel', value)}
+                        items={activityLevelOptions}
+                        placeholder="Select Activity Level"
+                        icon="speedometer"
+                    />
 
-                    <View style={styles.pickerContainer}>
-                        <Ionicons name="flag" size={20} color="#666" style={styles.inputIcon} />
-                        <Picker
-                            selectedValue={formData.goal}
-                            style={styles.picker}
-                            onValueChange={(value) => updateFormData('goal', value)}
-                        >
-                            <Picker.Item label="Maintain Weight" value="maintain" />
-                            <Picker.Item label="Lose Weight" value="lose" />
-                            <Picker.Item label="Gain Weight" value="gain" />
-                        </Picker>
-                    </View>
+                    <CustomPicker
+                        value={formData.goal}
+                        onValueChange={(value) => updateFormData('goal', value)}
+                        items={goalOptions}
+                        placeholder="Select Goal"
+                        icon="flag"
+                    />
 
                     <TouchableOpacity
                         style={styles.saveButton}
@@ -289,15 +372,73 @@ const styles = StyleSheet.create({
         borderRadius: 10,
         marginBottom: 15,
         paddingHorizontal: 15,
+        paddingVertical: 15,
         shadowColor: '#000',
         shadowOffset: { width: 0, height: 2 },
         shadowOpacity: 0.1,
         shadowRadius: 4,
         elevation: 3,
     },
-    picker: {
+    pickerText: {
         flex: 1,
-        height: 50,
+        fontSize: 16,
+        color: '#333',
+    },
+    placeholderText: {
+        color: '#999',
+    },
+    // Modal styles
+    modalOverlay: {
+        flex: 1,
+        backgroundColor: 'rgba(0, 0, 0, 0.5)',
+        justifyContent: 'flex-end',
+        position: 'absolute',
+        top: 0,
+        left: 0,
+        right: 0,
+        bottom: 0,
+    },
+    modalContent: {
+        backgroundColor: 'white',
+        borderTopLeftRadius: 20,
+        borderTopRightRadius: 20,
+        maxHeight: '70%',
+    },
+    modalHeader: {
+        flexDirection: 'row',
+        justifyContent: 'space-between',
+        alignItems: 'center',
+        padding: 20,
+        borderBottomWidth: 1,
+        borderBottomColor: '#E0E0E0',
+    },
+    modalTitle: {
+        fontSize: 18,
+        fontWeight: 'bold',
+        color: '#333',
+    },
+    closeButton: {
+        padding: 5,
+    },
+    modalItem: {
+        flexDirection: 'row',
+        justifyContent: 'space-between',
+        alignItems: 'center',
+        padding: 20,
+        borderBottomWidth: 1,
+        borderBottomColor: '#F0F0F0',
+    },
+    selectedModalItem: {
+        backgroundColor: '#F8F9FF',
+    },
+    modalItemText: {
+        fontSize: 16,
+        color: '#333',
+        flex: 1,
+    },
+    selectedModalItemText: {
+        color: '#4A90E2',
+        fontWeight: '600',
     },
     saveButton: {
         marginTop: 30,

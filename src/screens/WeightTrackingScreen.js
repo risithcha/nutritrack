@@ -15,7 +15,7 @@ import { useNutrition } from '../context/NutritionContext';
 
 const { width } = Dimensions.get('window');
 
-const WeightTrackingScreen = () => {
+const WeightTrackingScreen = ({ navigation }) => {
         const { weightData, addWeightEntry, weightGoal } = useNutrition();
         const [newWeight, setNewWeight] = useState('');
         const [showAddForm, setShowAddForm] = useState(false);
@@ -76,8 +76,18 @@ const WeightTrackingScreen = () => {
                                 colors={['#4A90E2', '#357ABD']}
                                 style={styles.header}
                         >
-                                <Text style={styles.headerTitle}>Weight Tracking</Text>
-                                <Text style={styles.headerSubtitle}>Monitor your progress</Text>
+                                <View style={styles.headerContent}>
+                                        <TouchableOpacity
+                                                style={styles.backButton}
+                                                onPress={() => navigation.goBack()}
+                                        >
+                                                <Ionicons name="arrow-back" size={24} color="white" />
+                                        </TouchableOpacity>
+                                        <View style={styles.headerTextContainer}>
+                                                <Text style={styles.headerTitle}>Weight Tracking</Text>
+                                                <Text style={styles.headerSubtitle}>Monitor your progress</Text>
+                                        </View>
+                                </View>
                         </LinearGradient>
 
                         {/* Current Weight Card */}
@@ -206,6 +216,17 @@ const styles = StyleSheet.create({
                 padding: 20,
                 paddingTop: 60,
                 paddingBottom: 30,
+        },
+        headerContent: {
+                flexDirection: 'row',
+                alignItems: 'center',
+        },
+        backButton: {
+                padding: 10,
+                marginRight: 15,
+        },
+        headerTextContainer: {
+                flex: 1,
         },
         headerTitle: {
                 fontSize: 28,

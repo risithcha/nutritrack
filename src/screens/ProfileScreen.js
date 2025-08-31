@@ -146,7 +146,7 @@ const ProfileScreen = ({ navigation }) => {
                         
                         <View style={styles.infoItem}>
                                 <View style={styles.infoLabelContainer}>
-                                        <Ionicons name="fitness" size={20} color="#4A90E2" />
+                                        <Ionicons name="speedometer" size={20} color="#4A90E2" />
                                         <Text style={styles.infoLabel}>Activity Level</Text>
                                 </View>
                                 <Text style={styles.infoValue}>{userProfile.activityLevel}</Text>
